@@ -14,7 +14,7 @@ import { CurrencyComboBox } from "@/Components/CurrencyComboBox";
 async function Wizard() {
   const user = await currentUser();
   return (
-    <main className="container flex flex-col items-center justify-between gap-4 max-w-xl">
+    <div className="w-4/5 container flex flex-col items-center justify-between gap-4 max-w-xl">
       <div>
         <h1 className="text-3xl text-center">
           Welcome, <span className="text-bold">{user.firstName}👋</span>
@@ -42,7 +42,7 @@ async function Wizard() {
         <Link href="/dashboard">I&apos;m done! Take me to the dashboard</Link>
       </Button>
       <Logo />
-    </main>
+    </div>
   );
 }
 

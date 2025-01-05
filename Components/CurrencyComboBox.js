@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,82 +11,152 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const Currencies = [
-  {
-    value: "USD",
-    label: "$ Dollar",
-    locale: "en-US",
-  },
-  {
-    value: "EUR",
-    label: "€ Euro",
-    locale: "de-DE",
-  },
-  {
-    value: "JPY",
-    label: "¥ Yen",
-    locale: "ja-JP",
-  },
-  {
-    value: "GBP",
-    label: "£ Pound",
-    locale: "en-GB",
-  },
-];
+import { useMutation, useQuery } from "@tanstack/react-query";
+import SkeletonWrapper from "./SkeletonWrapper";
+import { Currencies, getCurrency } from "@/lib/currencies";
+import { UpdateUserCurrency } from "@/app/wizard/_actions/userSettings";
+import { toast } from "sonner";
 
 export function CurrencyComboBox() {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const isDesktop = !useIsMobile();
+  const [selectedCurrency, setSelectedCurrency] = React.useState(null);
+
+  const userSettings = useQuery({
+    queryKey: ["userSettings"],
+    queryFn: () => fetch("/api/userSettings").then((res) => res.json()),
+  });
+
+  React.useEffect(() => {
+    if (!userSettings.data) {
+      return;
+    }
+    const userCurrency = Currencies.find(
+      (currency) => currency.value === userSettings.data.currency
+    );
+    if (userCurrency) {
+      setSelectedCurrency(userCurrency);
+    }
+  }, [userSettings.data]);
+
+  const mutation = useMutation({
+    mutationKey: ["UpdateCurrency"],
+    mutationFn: UpdateUserCurrency,
+    onSuccess: (data) => {
+      toast.success("Currency updated", {
+        id: "update-currency",
+      });
+      const currency = getCurrency(data.currency);
+      if (!currency) {
+        toast.error("Please set a valid currency");
+        return;
+      }
+      setSelectedCurrency(getCurrency(data.currency));
+    },
+  });
+
+  const selectOption = React.useCallback(
+    (currency) => {
+      if (!currency) {
+        toast.error("Please select a currency");
+        return;
+      }
+      console.log("here");
+      toast.loading("Updating currency...", {
+        id: "update-currency",
+      });
+      mutation.mutate(currency.value);
+    },
+    [mutation]
+  );
+
+  if (isDesktop) {
+    return (
+      <SkeletonWrapper isLoading={userSettings.isFetching}>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              disabled={mutation.isPending}
+            >
+              {selectedCurrency ? (
+                <>{selectedCurrency.label}</>
+              ) : (
+                <>Set Currency</>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0" align="start">
+            <CurrencyList
+              setOpen={setOpen}
+              setSelectedCurrency={selectOption}
+            />
+          </PopoverContent>
+        </Popover>
+      </SkeletonWrapper>
+    );
+  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen} className="w-full">
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {value
-            ? Currencies.find((currency) => currency.value === value)?.label
-            : "Set Currency"}
-          <ChevronsUpDown className="opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." />
-          <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              {Currencies.map((currency) => (
-                <CommandItem
-                  key={currency.value}
-                  value={currency.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  {currency.label}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      value === currency.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <SkeletonWrapper isLoading={userSettings.isFetching}>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            disabled={mutation.isPending}
+          >
+            {selectedCurrency ? (
+              <>{selectedCurrency.label}</>
+            ) : (
+              <>Set Currency</>
+            )}
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <div className="mt-4 border-t">
+            <CurrencyList
+              setOpen={setOpen}
+              setSelectedCurrency={selectOption}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    </SkeletonWrapper>
+  );
+}
+
+function CurrencyList({ setOpen, setSelectedCurrency, selectOption }) {
+  return (
+    <Command>
+      <CommandInput placeholder="Filter Currencies..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup>
+          {Currencies.map((currency) => (
+            <CommandItem
+              key={currency.value}
+              value={currency.value}
+              onSelect={(value) => {
+                setSelectedCurrency(
+                  Currencies.find((priority) => priority.value === value) ||
+                    null
+                );
+                setOpen(false);
+              }}
+            >
+              {currency.label}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 }
