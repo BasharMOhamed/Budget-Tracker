@@ -2,9 +2,8 @@
 
 import { UpdateUserCurrencySchema } from "@/schema/userSettings";
 import { currentUser } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 export async function UpdateUserCurrency(currency) {
   const parsedBody = UpdateUserCurrencySchema.safeParse({
     currency,

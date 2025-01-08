@@ -1,7 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { Prisma, PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 export async function GET(request) {
   const user = await currentUser();
   if (!user) {

@@ -39,7 +39,7 @@ async function Wizard() {
         </CardContent>
       </Card>
       <Button className="w-full" asChild>
-        <Link href="/dashboard">I&apos;m done! Take me to the dashboard</Link>
+        <Link href="/">I&apos;m done! Take me to the dashboard</Link>
       </Button>
       <Logo />
     </div>
