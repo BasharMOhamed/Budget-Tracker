@@ -27,12 +27,13 @@ import { CircleOff, Loader2, SquarePlus } from "lucide-react";
 import { PopoverTrigger, Popover, PopoverContent } from "./ui/popover";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateCategory } from "@/app/(dashboard)/_actions/categories";
 import { toast } from "sonner";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useTheme } from "next-themes";
-export default function CreateCategoryDialog({ type }) {
+export default function CreateCategoryDialog({ type, onSuccessCallback }) {
+  const [open, setOpen] = useState(false);
   const form = useForm({
     resolver: zodResolver(createCategorySchema),
     defaultValues: {
@@ -42,18 +43,25 @@ export default function CreateCategoryDialog({ type }) {
 
   const theme = useTheme();
 
+  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationKey: ["createCategory"],
     mutationFn: CreateCategory,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       form.reset({
         type,
         name: "",
         icon: "",
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+      onSuccessCallback(data);
       toast.success(`Category ${data.name} created successfully`, {
         id: "create-category",
       });
+      setOpen(false);
     },
   });
 
@@ -69,7 +77,7 @@ export default function CreateCategoryDialog({ type }) {
   );
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"

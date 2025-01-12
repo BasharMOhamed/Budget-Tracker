@@ -1,4 +1,5 @@
 import CreateTransactionDialog from "@/Components/CreateTransactionDialog";
+import Overview from "@/Components/Overview";
 import { Button } from "@/Components/ui/button";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
@@ -21,8 +22,8 @@ async function Dashboard() {
     redirect("/wizard");
   }
   return (
-    <div className="bg-card">
-      <header className="w-full flex justify-between px-8 py-10 border-b-2">
+    <div className="">
+      <header className="w-full flex justify-between px-8 py-10 border-b-2 bg-card">
         <h1 className="text-3xl text-bold">Hello, {user.firstName}! 👋</h1>
         <div className="flex gap-2">
           <CreateTransactionDialog
@@ -49,6 +50,7 @@ async function Dashboard() {
           />
         </div>
       </header>
+      <Overview userSettings={userSettings} />
     </div>
   );
 }

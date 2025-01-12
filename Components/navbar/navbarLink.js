@@ -9,7 +9,7 @@ function NavbarLink({ title, onClick }) {
     <div className="relative">
       <Link
         href={link}
-        className={`inline-flex items-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-900 h-10 px-4 py-2 w-full justify-start text-lg hover:text-foreground text-foreground ${
+        className={`inline-flex items-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent h-10 px-4 py-2 w-full justify-start text-lg hover:text-foreground text-foreground ${
           isActive ? "" : "opacity-50"
         }`}
         onClick={() => {

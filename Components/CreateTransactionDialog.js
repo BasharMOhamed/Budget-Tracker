@@ -24,21 +24,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import CategoryPicker from "./CattegoryPicker";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTransaction } from "@/app/(dashboard)/_actions/transactions";
 import { toast } from "sonner";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export default function CreateTransactionDialog({ trigger, type }) {
+  const [open, setOpen] = useState(false);
   const form = useForm({
     resolver: zodResolver(CreateTransactionSchema),
     defaultValues: {
       type,
       date: new Date(),
+      amount: 0,
     },
   });
 
@@ -49,16 +51,28 @@ export default function CreateTransactionDialog({ trigger, type }) {
     [form]
   );
 
+  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationKey: ["createTransaction"],
-    mutation: createTransaction,
-    onSuccess: (data) => {
-      form.reset();
+    mutationFn: createTransaction,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["overview"],
+      });
       toast.success("Transaction created successfully", {
         id: "create-transaction",
       });
+      form.reset({
+        type,
+        description: "",
+        date: new Date(),
+        category: undefined,
+      });
+      setOpen(false);
     },
-    onError: () => {
+    onError: (e) => {
+      console.log(e);
       toast.error("Error creating transaction", {
         id: "create-transaction",
       });
@@ -67,6 +81,7 @@ export default function CreateTransactionDialog({ trigger, type }) {
 
   const onSubmit = useCallback(
     (values) => {
+      console.log(values);
       toast.loading("Creating Transaction...", {
         id: "create-transaction",
       });
@@ -76,7 +91,7 @@ export default function CreateTransactionDialog({ trigger, type }) {
   );
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -115,7 +130,19 @@ export default function CreateTransactionDialog({ trigger, type }) {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input defaultValue={0} min={0} type="number" {...field} />
+                    <Input
+                      defaultValue={0}
+                      min={0}
+                      type="number"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value > 0
+                            ? Number(e.target.value)
+                            : e.target.value
+                        )
+                      }
+                    />
                   </FormControl>
                   <FormDescription>
                     Transaction amount (required).
@@ -195,7 +222,9 @@ export default function CreateTransactionDialog({ trigger, type }) {
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={form.handleSubmit(onSubmit)}>Create</Button>
+          <Button onClick={form.handleSubmit(onSubmit)}>
+            {isPending ? <Loader2 className="animate-spin" /> : "Create"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

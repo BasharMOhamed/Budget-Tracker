@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import {
@@ -26,6 +26,18 @@ export default function CategoryPicker({ type, onChange }) {
   const selectedCategory = categoriesQuery.data?.find(
     (category) => category.name === value
   );
+
+  const successCallback = useCallback(
+    (category) => {
+      setValue(category.name);
+      setOpen((prev) => !prev);
+    },
+    [setOpen, setValue]
+  );
+
+  useEffect(() => {
+    onChange(value);
+  }, [value, onChange]);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger>
@@ -46,7 +58,10 @@ export default function CategoryPicker({ type, onChange }) {
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder="Search Category..." />
-          <CreateCategoryDialog type={type} />
+          <CreateCategoryDialog
+            type={type}
+            onSuccessCallback={successCallback}
+          />
           <CommandList>
             <CommandEmpty>
               Category not found
@@ -62,7 +77,7 @@ export default function CategoryPicker({ type, onChange }) {
                     value={category.name}
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue);
-                      onChange(value);
+
                       setOpen(false);
                     }}
                   >
