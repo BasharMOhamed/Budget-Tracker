@@ -18,82 +18,62 @@ import {
   SelectTrigger,
 } from "./ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import CountUp from "react-countup";
 import { getFormatterForCurrency } from "@/lib/helpers";
+import { Separator } from "./ui/separator";
+import { useQuery } from "@tanstack/react-query";
+import SkeletonWrapper from "./SkeletonWrapper";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const data = [
-  {
-    name: "Jan",
-    Income: 4000,
-    Expense: 2400,
-  },
-  {
-    name: "Feb",
-    Income: 3000,
-    Expense: 1398,
-  },
-  {
-    name: "Mar",
-    Income: 2000,
-    Expense: 9800,
-  },
-  {
-    name: "Apr",
-    Income: 2780,
-    Expense: 3908,
-  },
-  {
-    name: "May",
-    Income: 1890,
-    Expense: 4800,
-  },
-  {
-    name: "Jun",
-    Income: 2390,
-    Expense: 3800,
-  },
-  {
-    name: "Jul",
-    Income: 3490,
-    Expense: 4300,
-  },
-  {
-    name: "Aug",
-    Income: 2000,
-    Expense: 9800,
-  },
-  {
-    name: "Sep",
-    Income: 2780,
-    Expense: 3908,
-  },
-  {
-    name: "Oct",
-    Income: 1890,
-    Expense: 4800,
-  },
-  {
-    name: "Nov",
-    Income: 2390,
-    Expense: 3800,
-  },
-  {
-    name: "Dec",
-    Income: 3490,
-    Expense: 4300,
-  },
+const allMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 export default function History({ userSettings }) {
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState("January");
+  const historyQuery = useQuery({
+    queryKey: ["yearHistory", year],
+    queryFn: () =>
+      fetch(`/api/History/year?year=${year}`).then((res) => res.json()),
+  });
+
+  const monthHistoryQuery = useQuery({
+    queryKey: ["monthHistory", year, month],
+    queryFn: () =>
+      fetch(`/api/History/month?year=${year}&month=${month}`).then((res) =>
+        res.json()
+      ),
+  });
+
   const formatter = useMemo(() => {
     return getFormatterForCurrency(userSettings.currency);
   }, [userSettings.currency]);
+
+  const yearData = useMemo(() => {
+    if (!historyQuery.data) return [];
+    return allMonths.map((month) => {
+      const result = historyQuery.data.find((m) => m.month === month);
+      return result ? result : { month, income: 0, expense: 0 };
+    });
+  }, [historyQuery.data]);
   return (
-    <div className="w-4/5">
+    <div className="w-4/5 mb-1">
       <h2 className="text-3xl font-bold mb-1">History</h2>
       <Card className="p-6">
-        <Tabs defaultValue="month">
+        <Tabs defaultValue="year">
           <div className="flex justify-between flex-wrap">
             <div className="flex flex-wrap gap-3">
               <TabsList>
@@ -101,20 +81,24 @@ export default function History({ userSettings }) {
                 <TabsTrigger value="month">Month</TabsTrigger>
               </TabsList>
               <div className="flex flex-wrap gap-2">
-                <Select defaultValue="2025">
+                <Select defaultValue={year} onValueChange={setYear}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select a Year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="2025">2025</SelectItem>
+                    <SelectItem value={year}>{year}</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select defaultValue="Jan">
+                <Select defaultValue={month} onValueChange={setMonth}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select a Year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Jan">January</SelectItem>
+                    {allMonths.map((month) => (
+                      <SelectItem key={month} value={month}>
+                        {month}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -126,21 +110,27 @@ export default function History({ userSettings }) {
           </div>
           <Card className="mt-4">
             <TabsContent value="month">
-              <ResponsiveContainer width={"100%"} height={300}>
-                <BarChart height={300} data={data} barCategoryGap={5}>
-                  {/* <CartesianGrid strokeDasharray="3 3" /> */}
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip
-                    cursor={{ opacity: 0.1 }}
-                    content={<CustomeToolTip formatter={formatter} />}
-                  />
-                  <Bar dataKey="Income" fill="#10b081" />
-                  <Bar dataKey="Expense" fill="#ef4444" />
-                </BarChart>
-              </ResponsiveContainer>
+              <SkeletonWrapper isLoading={monthHistoryQuery.isFetching}>
+                <CustomBarChart
+                  data={monthHistoryQuery.data || []}
+                  xAxisKey="day"
+                  barKeys={["income", "expense"]}
+                  colors={["#10b081", "#ef4444"]}
+                  formatter={formatter}
+                />
+              </SkeletonWrapper>
             </TabsContent>
-            <TabsContent value="year">This is the Year History.</TabsContent>
+            <TabsContent value="year">
+              <SkeletonWrapper isLoading={historyQuery.isFetching}>
+                <CustomBarChart
+                  data={yearData}
+                  xAxisKey="month"
+                  barKeys={["income", "expense"]}
+                  colors={["#10b081", "#ef4444"]}
+                  formatter={formatter}
+                />
+              </SkeletonWrapper>
+            </TabsContent>
           </Card>
         </Tabs>
       </Card>
@@ -159,26 +149,27 @@ function BadgeComponent({ title, color }) {
 
 function CustomeToolTip({ active, payload, label, formatter }) {
   if (active && payload && payload.length) {
+    const { income, expense } = payload[0].payload;
+    console.log(payload);
     return (
-      <div className="rounded-xl w-[200px] bg-background px-2">
+      <div className="rounded-xl w-[200px] bg-background px-2 p-2">
+        <h3 className="text-lg font-bold">{label}</h3>
         <TooltipRow
           bgColor="emerald"
-          textColor=""
-          value={500}
+          value={income}
           label="Income"
           formatter={formatter}
         />
         <TooltipRow
           bgColor="red"
-          textColor=""
-          value={200}
+          value={expense}
           label="Expense"
           formatter={formatter}
         />
+        <Separator />
         <TooltipRow
           bgColor="violet"
-          textColor=""
-          value={500 - 200}
+          value={income - expense}
           label="Balance"
           formatter={formatter}
         />
@@ -187,7 +178,7 @@ function CustomeToolTip({ active, payload, label, formatter }) {
   }
 }
 
-function TooltipRow({ bgColor, textColor, value, label, formatter }) {
+function TooltipRow({ bgColor, value, label, formatter }) {
   const formatFn = useCallback(
     (value) => {
       return formatter.format(value);
@@ -209,5 +200,25 @@ function TooltipRow({ bgColor, textColor, value, label, formatter }) {
         className={`text-xs text-${bgColor}-500`}
       />
     </div>
+  );
+}
+
+function CustomBarChart({ data, xAxisKey, barKeys, colors, formatter }) {
+  const isMobile = useIsMobile();
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data} barCategoryGap={5}>
+        <CartesianGrid strokeDasharray="5 5" opacity={0.1} />
+        <XAxis dataKey={xAxisKey} tick={isMobile ? false : { fontSize: 13 }} />
+        <YAxis fontSize={10} />
+        <Tooltip
+          cursor={{ opacity: 0.1 }}
+          content={<CustomeToolTip formatter={formatter} />}
+        />
+        {barKeys.map((key, index) => (
+          <Bar key={key} dataKey={key} fill={colors[index]} />
+        ))}
+      </BarChart>
+    </ResponsiveContainer>
   );
 }
