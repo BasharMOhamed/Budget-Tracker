@@ -18,7 +18,7 @@ export default function CategoriesStats({ to, from, userSettings }) {
   }, [userSettings.currency]);
   //   const byIncome = statsQuery.data.map()
   return (
-    <div className="w-4/5 flex gap-3">
+    <div className="w-4/5 flex flex-wrap gap-3 md:flex-nowrap">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         {statsQuery.data && (
           <CategoriesCard
@@ -50,8 +50,8 @@ function CategoriesCard({ formatter, type, data }) {
   //   );
   console.log("Data: ", data);
   const filteredData = data.filter((t) => t.type === type);
-  //   const filteredData = [];
-  const total = filteredData.reduce((acc, el) => acc + el._sum.amount, 0);
+  // const filteredData = [];
+  const total = filteredData?.reduce((acc, el) => acc + el._sum.amount, 0) || 0;
   return (
     <Card className="w-full col-span-6">
       <CardHeader>
@@ -63,7 +63,7 @@ function CategoriesCard({ formatter, type, data }) {
         {filteredData.length === 0 && (
           <div className="flex flex-col justify-center items-center">
             No data for the selected period
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Try selecting a different period or try adding new {type}s
             </p>
           </div>

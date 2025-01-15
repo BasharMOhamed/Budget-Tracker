@@ -8,17 +8,13 @@ import { useState } from "react";
 import CategoriesStats from "./CategoriesStats";
 import History from "./History";
 export default function Overview({ userSettings }) {
-  //   const [dateRange, setDateRange] = useState({
-  //     from: startOfMonth(new Date()),
-  //     to: new Date(),
-  //   });
   const [date, setDate] = useState({
     from: startOfMonth(new Date()),
     to: new Date(),
   });
   return (
     <div className="flex flex-col w-full items-center">
-      <div className="flex flex-wrap items-center justify-between py-6 w-4/5">
+      <div className="flex flex-col gap-3 flex-wrap items-center justify-between py-6 w-4/5 md:flex-row">
         <h2 className="text-3xl font-bold">Overview</h2>
         <div className="flex items-center gap-3">
           <DatePickerWithRange date={date} setDate={setDate} />
@@ -31,7 +27,7 @@ export default function Overview({ userSettings }) {
           to={date.to}
           userSettings={userSettings}
         />
-        <History />
+        <History userSettings={userSettings} />
       </div>
     </div>
   );

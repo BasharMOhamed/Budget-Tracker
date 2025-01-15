@@ -21,7 +21,7 @@ export default function StatsCards({ to, from, userSettings }) {
   const income = statsQuery.data?.income || 0;
   const expense = statsQuery.data?.expense || 0;
   return (
-    <div className="w-4/5 flex gap-3 md:flex-no-wrap">
+    <div className="w-4/5 flex gap-3 flex-wrap md:flex-nowrap">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <StatCard
           value={income}

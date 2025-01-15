@@ -23,7 +23,7 @@ async function Dashboard() {
   }
   return (
     <div className="">
-      <header className="w-full flex justify-between px-8 py-10 border-b-2 bg-card">
+      <header className="w-full flex flex-wrap gap-3 justify-between px-8 py-10 border-b-2 bg-card">
         <h1 className="text-3xl text-bold">Hello, {user.firstName}! 👋</h1>
         <div className="flex gap-2">
           <CreateTransactionDialog
