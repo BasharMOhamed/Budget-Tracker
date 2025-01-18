@@ -1,8 +1,8 @@
-import Navbar from "@/Components/navbar/navbar";
+import Navbar from "@/components/navbar/navbar";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
-import ReactQueryProvider from "@/Components/Providers/ReactQueryProvider";
+import ReactQueryProvider from "@/components/Providers/ReactQueryProvider";
 // import { QueryClientProvider } from "react-query";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 export const metadata = {

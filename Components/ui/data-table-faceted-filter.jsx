@@ -3,8 +3,8 @@ import { Column } from "@tanstack/react-table";
 import { Check, PlusCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "@/Components/ui/badge";
-import { Button } from "@/Components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -13,13 +13,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/Components/ui/command";
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/Components/ui/popover";
-import { Separator } from "@/Components/ui/separator";
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 
 export function DataTableFacetedFilter({ column, title, options }) {
   const facets = column?.getFacetedUniqueValues();

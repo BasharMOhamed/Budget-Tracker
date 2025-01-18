@@ -1,6 +1,6 @@
-import CreateTransactionDialog from "@/Components/CreateTransactionDialog";
-import Overview from "@/Components/Overview";
-import { Button } from "@/Components/ui/button";
+import CreateTransactionDialog from "@/components/CreateTransactionDialog";
+import Overview from "@/components/Overview";
+import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";

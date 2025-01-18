@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -10,13 +10,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/Components/ui/command";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/Components/ui/drawer";
+} from "@/components/ui/command";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/Components/ui/popover";
+} from "@/components/ui/popover";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import SkeletonWrapper from "./SkeletonWrapper";
 import { Currencies, getCurrency } from "@/lib/currencies";

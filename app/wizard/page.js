@@ -1,4 +1,4 @@
-import { Separator } from "@/Components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { currentUser } from "@clerk/nextjs/server";
 import {
   Card,
@@ -6,11 +6,11 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Logo from "@/Components/Logo";
-import { CurrencyComboBox } from "@/Components/CurrencyComboBox";
+import Logo from "@/components/Logo";
+import { CurrencyComboBox } from "@/components/CurrencyComboBox";
 async function Wizard() {
   const user = await currentUser();
   return (

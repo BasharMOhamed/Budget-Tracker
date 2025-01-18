@@ -1,6 +1,6 @@
 "use client";
-import { TransactionsTable } from "@/Components/TransactionsTable";
-import { DatePickerWithRange } from "@/Components/ui/date-range-picker";
+import { TransactionsTable } from "@/components/TransactionsTable";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { startOfMonth } from "date-fns";
 import { useState } from "react";
 

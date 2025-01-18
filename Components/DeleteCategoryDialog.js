@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/Components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

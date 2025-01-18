@@ -1,12 +1,12 @@
-import { CurrencyComboBox } from "@/Components/CurrencyComboBox";
+import { CurrencyComboBox } from "@/components/CurrencyComboBox";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/Components/ui/card";
-import CategoryManagement from "@/Components/CategoryManagement";
+} from "@/components/ui/card";
+import CategoryManagement from "@/components/CategoryManagement";
 
 export const metadata = {
   title: "Manage",

@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { Button } from "./ui/button";
 import React, { useMemo, useState } from "react";
 import { DataTableColumnHeader } from "./ui/DataTableColumnHeader";
