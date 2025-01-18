@@ -3,7 +3,7 @@ const { default: Link } = require("next/link");
 
 function Logo({ mobile }) {
   return (
-    <Link href="/dashboard" className="flex items-center gap-2">
+    <Link href="/" className="flex items-center gap-2">
       {!mobile && (
         <PiggyBank className="stroke h-11 w-11 stroke-amber-500 stroke=[1.5]" />
       )}

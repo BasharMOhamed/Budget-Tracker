@@ -8,8 +8,8 @@ function Navbar() {
   return (
     <>
       <MobileMenu />
-      <div className="hidden border-separate border-b bg-background md:block py-5">
-        <div className="container flex items-center justify-between px-12">
+      <div className="hidden border-separate border-b bg-background md:flex justify-center py-5">
+        <div className="flex items-center justify-between w-full px-8">
           <div className="flex items-center gap-4">
             <Logo />
             <div className="flex items-center">

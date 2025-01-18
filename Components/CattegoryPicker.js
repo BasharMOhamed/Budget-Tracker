@@ -61,6 +61,15 @@ export default function CategoryPicker({ type, onChange }) {
           <CreateCategoryDialog
             type={type}
             onSuccessCallback={successCallback}
+            trigger={
+              <Button
+                variant="outline"
+                className="bg-transparent justify-start text-muted-foreground"
+              >
+                <SquarePlus />
+                Create new
+              </Button>
+            }
           />
           <CommandList>
             <CommandEmpty>

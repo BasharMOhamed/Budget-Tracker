@@ -93,7 +93,7 @@ export default function CreateTransactionDialog({ trigger, type }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-4/5 md:w-[600px]">
         <DialogHeader>
           <DialogTitle>
             Create a new{" "}
@@ -151,12 +151,12 @@ export default function CreateTransactionDialog({ trigger, type }) {
                 </FormItem>
               )}
             />
-            <div className="flex justify-between gap-9">
+            <div className="flex flex-wrap md:flex-nowrap justify-between gap-9">
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col items-start">
                     <FormLabel>Category</FormLabel>
                     <FormControl>
                       <CategoryPicker
@@ -175,7 +175,7 @@ export default function CreateTransactionDialog({ trigger, type }) {
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col items-start">
                     <FormLabel>Transaction date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -208,7 +208,9 @@ export default function CreateTransactionDialog({ trigger, type }) {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormDescription>Select a date for this.</FormDescription>
+                    <FormDescription className="">
+                      Select a date for this.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -217,7 +219,7 @@ export default function CreateTransactionDialog({ trigger, type }) {
           </Form>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant={"secondary"} onClick={() => form.reset()}>
               Cancel
             </Button>

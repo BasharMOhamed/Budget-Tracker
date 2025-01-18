@@ -92,3 +92,70 @@ export async function createTransaction(form) {
     }),
   ]);
 }
+
+export async function DeleteTransaction(id) {
+  const user = await currentUser();
+  if (!user) {
+    redirect("sign-in");
+  }
+
+  const transaction = await prisma.transaction.findUnique({
+    where: {
+      id: id,
+      userId: user.id,
+    },
+  });
+  return await prisma.$transaction([
+    prisma.transaction.delete({
+      where: {
+        id: id,
+        userId: user.id,
+      },
+    }),
+
+    prisma.yearHistory.update({
+      where: {
+        month_year_userId: {
+          userId: user.id,
+          year: transaction.date.getFullYear(),
+          month: transaction.date.getMonth(),
+        },
+      },
+      data: {
+        ...(transaction.type === "expense" && {
+          expense: {
+            decrement: transaction.amount,
+          },
+        }),
+        ...(transaction.type === "income" && {
+          income: {
+            decrement: transaction.amount,
+          },
+        }),
+      },
+    }),
+
+    prisma.monthHistory.update({
+      where: {
+        day_month_year_userId: {
+          userId: user.id,
+          month: transaction.date.getMonth(),
+          year: transaction.date.getFullYear(),
+          day: transaction.date.getDate(),
+        },
+      },
+      data: {
+        ...(transaction.type === "expense" && {
+          expense: {
+            decrement: transaction.amount,
+          },
+        }),
+        ...(transaction.type === "income" && {
+          income: {
+            decrement: transaction.amount,
+          },
+        }),
+      },
+    }),
+  ]);
+}

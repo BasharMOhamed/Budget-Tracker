@@ -44,12 +44,21 @@ const allMonths = [
 export default function History({ userSettings }) {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState("January");
+
+  // Fetch All Years
+  const yearsQuery = useQuery({
+    queryKey: ["availableYears"],
+    queryFn: () => fetch("/api/History/years").then((res) => res.json()),
+  });
+
+  // Fetch Year Transactions
   const historyQuery = useQuery({
     queryKey: ["yearHistory", year],
     queryFn: () =>
       fetch(`/api/History/year?year=${year}`).then((res) => res.json()),
   });
 
+  // Fetch Month Transactions
   const monthHistoryQuery = useQuery({
     queryKey: ["monthHistory", year, month],
     queryFn: () =>
@@ -74,7 +83,7 @@ export default function History({ userSettings }) {
       <h2 className="text-3xl font-bold mb-1">History</h2>
       <Card className="p-6">
         <Tabs defaultValue="year">
-          <div className="flex justify-between flex-wrap">
+          <div className="flex justify-between flex-wrap gap-2">
             <div className="flex flex-wrap gap-3">
               <TabsList>
                 <TabsTrigger value="year">Year</TabsTrigger>
@@ -86,7 +95,12 @@ export default function History({ userSettings }) {
                     <SelectValue placeholder="Select a Year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={year}>{year}</SelectItem>
+                    {yearsQuery.data?.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                    {/* <SelectItem value={year}>{year}</SelectItem> */}
                   </SelectContent>
                 </Select>
                 <Select defaultValue={month} onValueChange={setMonth}>
@@ -209,7 +223,7 @@ function CustomBarChart({ data, xAxisKey, barKeys, colors, formatter }) {
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} barCategoryGap={5}>
         <CartesianGrid strokeDasharray="5 5" opacity={0.1} />
-        <XAxis dataKey={xAxisKey} tick={isMobile ? false : { fontSize: 13 }} />
+        <XAxis dataKey={xAxisKey} tick={isMobile ? false : { fontSize: 12 }} />
         <YAxis fontSize={10} />
         <Tooltip
           cursor={{ opacity: 0.1 }}

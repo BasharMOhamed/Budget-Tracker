@@ -22,7 +22,7 @@ import {
 import { Input } from "./ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./ui/button";
-import { createCategorySchema } from "@/schema/categories";
+import { CategorySchema } from "@/schema/categories";
 import { CircleOff, Loader2, SquarePlus } from "lucide-react";
 import { PopoverTrigger, Popover, PopoverContent } from "./ui/popover";
 import data from "@emoji-mart/data";
@@ -32,10 +32,14 @@ import { CreateCategory } from "@/app/(dashboard)/_actions/categories";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { useTheme } from "next-themes";
-export default function CreateCategoryDialog({ type, onSuccessCallback }) {
+export default function CreateCategoryDialog({
+  type,
+  onSuccessCallback,
+  trigger,
+}) {
   const [open, setOpen] = useState(false);
   const form = useForm({
-    resolver: zodResolver(createCategorySchema),
+    resolver: zodResolver(CategorySchema),
     defaultValues: {
       type,
     },
@@ -57,7 +61,7 @@ export default function CreateCategoryDialog({ type, onSuccessCallback }) {
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
-      onSuccessCallback(data);
+      if (onSuccessCallback) onSuccessCallback(data);
       toast.success(`Category ${data.name} created successfully`, {
         id: "create-category",
       });
@@ -78,16 +82,8 @@ export default function CreateCategoryDialog({ type, onSuccessCallback }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="bg-transparent justify-start text-muted-foreground"
-        >
-          <SquarePlus />
-          Create new
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="w-4/5 md:w-[600px]">
         <DialogHeader>
           <DialogTitle>
             Create{" "}

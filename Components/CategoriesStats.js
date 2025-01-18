@@ -20,7 +20,7 @@ export default function CategoriesStats({ to, from, userSettings }) {
   return (
     <div className="w-4/5 flex flex-wrap gap-3 md:flex-nowrap">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        {statsQuery.data && (
+        {!statsQuery.isFetching && (
           <CategoriesCard
             formatter={formatter}
             type="income"
@@ -29,7 +29,7 @@ export default function CategoriesStats({ to, from, userSettings }) {
         )}
       </SkeletonWrapper>
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        {statsQuery.data && (
+        {!statsQuery.isFetching && (
           <CategoriesCard
             formatter={formatter}
             type="expense"

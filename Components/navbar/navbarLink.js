@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 function NavbarLink({ title, onClick }) {
-  const link = `/${title.toLowerCase()}`;
+  const link = title === "Dashboard" ? "/" : `/${title.toLowerCase()}`;
   const pathname = usePathname();
   const isActive = pathname === link;
   return (
